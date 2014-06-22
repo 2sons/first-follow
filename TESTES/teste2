@@ -1,0 +1,6 @@
+a,b,c,d,e
+S:aBc|bc|BCd|a
+B:bD|bC|epsilon
+C:aC|Ba|Dc|epsilon
+D:BC|cd|ac|Ce
+$$
