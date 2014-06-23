@@ -164,6 +164,7 @@ Gramatica *leGramatica(){
 
 		if (strcmp(temporario,"$$") == 0)
 		{
+
 			break;
 		}
 
@@ -381,7 +382,7 @@ int verificaEpsilon(Estado *estado) {
  */
 void conjuntoFirst(Gramatica *gramatica) {
 
-	int i = 0,j = 0,k = 0,w = 0,aux;
+	int i = 0,j = 0,k = 0,w = 0,aux = 0;
 
 	/**
 	 * Identifica simbolos terminais
@@ -437,7 +438,7 @@ void conjuntoFirst(Gramatica *gramatica) {
 
 				if (terminal <= 0)
 				{
-					if (opcao->producao[0] == estado->identificador[0] || opcao->ehEpsilon)
+					if (opcao->ehEpsilon)
 					{
 						continue;
 					}
@@ -471,8 +472,6 @@ void conjuntoFirst(Gramatica *gramatica) {
 						var[0] = opcao->producao[contador];
 						var[1] = '\0';
 
-						// printf("estado %s producao %s contador %d\n",estado->identificador,opcao->producao,contador );
-
 						Estado *firstEstado = buscaEstadoPorIdentificador(gramatica,var);
 
 						temEpsilon = 0;
@@ -501,7 +500,6 @@ void conjuntoFirst(Gramatica *gramatica) {
 								if (firstEstado->first[k] != '\27')
 								{
 									alterou = 1;
-									printf("%s --- %c\n",estado->first,firstEstado->first[k] );
 									strncat(estado->first,&firstEstado->first[k],1);
 								}
 							}
@@ -519,7 +517,6 @@ void conjuntoFirst(Gramatica *gramatica) {
 					} while (temEpsilon);
 				}
 			}
-			// printf("%s\n",estado->first );
 		}
 
 	} while (alterou);
