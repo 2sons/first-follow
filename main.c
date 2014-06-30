@@ -117,6 +117,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	conjuntoFirst(gramatica);
+	conjuntoFollow(gramatica);
 
 	return 0;
 }
@@ -525,5 +526,213 @@ void conjuntoFirst(Gramatica *gramatica) {
 	{
 		printf("%s: %s\n",gramatica->estados[i]->identificador,gramatica->estados[i]->first );
 	}
+	return;
+}
+
+void conjuntoFollow(Gramatica *gramatica) {
+
+	int i, j, k, l;
+
+	strncat(gramatica->estados[0]->follow, "$", 1);
+
+	/**
+	 * Primeira etapa
+	 */
+	for (i = 0; i < gramatica->numEstados; i++)
+	{
+		Estado *estado = gramatica->estados[i];
+
+		for (j = 0; j < estado->nOpcoes; j++)
+		{
+			Opcao *opcao = estado->opcoes[j];
+
+			if (strlen(opcao->producao) < 2) {
+
+				continue;
+			}
+			
+			int prosseguir = 1;
+			int posicao = 0;
+
+			while(prosseguir && posicao < strlen(opcao->producao)){
+
+				if (ehTerminal(opcao->producao[posicao], gramatica->alfabeto) && posicao < strlen(opcao->producao)) 
+				{
+					posicao++;
+					continue;
+				}
+				prosseguir = 0;
+
+				char temp[2];
+				temp[0] = opcao->producao[posicao];
+				temp[1] = '\0';
+
+				Estado *atual = buscaEstadoPorIdentificador(gramatica, temp);
+
+				for (k = 0; k < strlen(atual->first); k++)
+				{
+					if (atual->first[k] == '\27')
+					{
+						
+						prosseguir = 1;
+						break;
+					}
+				}
+				
+				if (ehTerminal(opcao->producao[posicao+1], gramatica->alfabeto)) 
+				{
+					temp[0] = opcao->producao[posicao+1];
+					temp[1] = '\0';
+					
+					int achou = 0;
+
+					for (l = 0; l < strlen(atual->follow); l++)
+					{
+						if (atual->follow[l] == opcao->producao[posicao+1])
+						{
+							achou = 1;
+							break;
+						}
+					}
+
+					if (!achou) 
+					{
+						strncat(atual->follow, temp, 1);
+					}
+				
+					
+				} 
+				else
+				{
+					
+					char aux[2];
+					aux[0] = opcao->producao[posicao+1];
+					aux[1] = '\0';
+
+					Estado *proximo = buscaEstadoPorIdentificador(gramatica, aux);
+
+					if (!proximo) {
+						posicao++;
+						continue;
+					}
+					
+					for (k = 0; k < strlen(proximo->first); k++)
+					{
+						if (proximo->first[k] == '\27') {
+
+							continue;
+						}
+
+						int achou = 0;
+
+						for (l = 0; l < strlen(atual->follow); l++)
+						{
+							if (atual->follow[l] == proximo->first[k])
+							{
+								achou = 1;
+								break;
+							}
+						}
+
+						if (!achou) 
+						{
+							strncat(atual->follow, &proximo->first[k], 1);
+						}
+					}
+				}
+				posicao++;
+			}
+		}	
+	}
+
+	/**
+	 * Segunda etapa
+	 */
+	int alterou = 1;
+
+	while(alterou) {
+
+		alterou = 0;
+
+
+		for (i = 0; i < gramatica->numEstados; i++)
+		{
+
+			Estado *estado = gramatica->estados[i];
+
+			for (j = 0; j <  estado->nOpcoes; j++)
+			{
+
+				Opcao *opcao = estado->opcoes[j];
+				int ultimaPosicao = strlen(opcao->producao) - 1;
+
+				int prosseguir = 1;
+
+				do
+				{
+					prosseguir = 0;
+
+					if (ehTerminal(opcao->producao[ultimaPosicao], gramatica->alfabeto) || opcao->ehEpsilon)
+					{
+						ultimaPosicao--;
+						continue;
+					}
+
+					char temp[2];
+					temp[0] = opcao->producao[ultimaPosicao];
+					temp[1] = '\0';
+
+					Estado *atual = buscaEstadoPorIdentificador(gramatica, temp);
+
+					if (atual == NULL)
+					{
+						printf("ERRO...\n");
+						exit(1);
+					}
+
+					for (k = 0; k <  strlen(estado->follow); k++)
+					{
+						int escreve = 1;
+
+						for (l = 0; l < strlen(atual->follow); l++)
+						{
+							if (atual->follow[l] == estado->follow[k])
+							{
+								escreve = 0;
+								break;
+							}
+						}
+
+						if (escreve)
+						{
+							char aux[2];
+							aux[0] = estado->follow[k];
+							aux[1] = '\0';
+
+							strncat(atual->follow,aux,1);
+							alterou = 1;
+						}
+					}
+
+					for (k = 0; k < strlen(atual->first); k++)
+					{
+						if (atual->first[k] == '\27')
+						{
+							prosseguir = 1;
+							break;
+						}
+					}
+					ultimaPosicao--;
+
+				} while (prosseguir && ultimaPosicao >= 0);
+			}		
+		}
+	}
+
+	for (i = 0; i < gramatica->numEstados; i++)
+	{
+		printf("Follow %s\n",gramatica->estados[i]->follow );
+	}
+
 	return;
 }

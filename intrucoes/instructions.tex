@@ -33,7 +33,7 @@
 Para compilar o programa, deverá ser executado o seguinte comando em linha de comando:
 
 \begin{center}
-gcc main.c -o determiniza -Wall
+gcc main.c -o conjunto -Wall
 \end{center}
 
 \subsection *{Execução}
@@ -52,19 +52,17 @@ A primeira linha denota os símbolos do alfabeto, separados por vírgula.
 Após isso é inserido a gramática no formato $[ESTADO]:PRODUCAO1|PRODUCAO2$.
 
 O primeiro estado digitado é o estado de entrada da gramática.
-Para determinizarmos, fazemos uso de um estado reservado, denotado por $X$, onde este não é possível ser usado como entrada direta da gramática.
-
 Para representar o simbolo $\varepsilon$  será necessário adicionar a palavra literal \textit{epsilon} como produção.
 Após os estados serem digitados, é necessário digitar $\$\$$ para demarcar o fim
 da leitura da gramática.
-Após isto, o programa irá determinizar a gramática, se necessário.
+Após isto, o programa irá construir o conjunto First e Follow da gramática passada.
 
-Supondo que o arquivo de teste criado tenha o nome $teste2$, então para executar o algoritmo, deve-se digitar o seguinte comando em um terminal:
+Supondo que o arquivo de teste criado tenha o nome $teste$, então para executar o algoritmo, deve-se digitar o seguinte comando em um terminal:
 
 \begin{center}
-./determiniza < teste2
+./conjunto < teste
 \end{center}
 
-Caso seja necessário determinizar a gramática, a saída do algoritmo será uma tabela de transições da gramática determinizada.
+O algoritmo terá como dado de saída o conjunto First e Follow.
 
 \end{document}

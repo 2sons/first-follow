@@ -1,3 +1,3 @@
-Determinização de uma gramática regular 
+Follow and First 
 =====================
 
