@@ -117,6 +117,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	conjuntoFirst(gramatica);
+  printf("\n");
 	conjuntoFollow(gramatica);
 
 	return 0;
@@ -522,10 +523,28 @@ void conjuntoFirst(Gramatica *gramatica) {
 
 	} while (alterou);
 
-	for (i = 0; i < gramatica->numEstados; i++)
-	{
-		printf("%s: %s\n",gramatica->estados[i]->identificador,gramatica->estados[i]->first );
-	}
+	printf("    |              First\n");
+  printf("--------------------------------------\n");
+
+  for (i = 0; i < gramatica->numEstados; i++)
+  {
+    printf(" %2s | ", gramatica->estados[i]->identificador);
+
+    for (j = 0; j < strlen(gramatica->estados[i]->first); j++)
+    {
+      if (gramatica->estados[i]->first[j] == '\27') {
+        printf("epsilon");
+      } else {
+        printf("%c", gramatica->estados[i]->first[j]);
+      }
+
+      if (j != strlen(gramatica->estados[i]->first) - 1) {
+        printf(", ");
+      }
+    }
+
+    printf("\n");
+  }
 	return;
 }
 
@@ -729,9 +748,23 @@ void conjuntoFollow(Gramatica *gramatica) {
 		}
 	}
 
+  printf("    |           Follow\n");
+  printf("--------------------------------------\n");
+
 	for (i = 0; i < gramatica->numEstados; i++)
 	{
-		printf("Follow %s\n",gramatica->estados[i]->follow );
+		printf(" %2s | ", gramatica->estados[i]->identificador);
+
+    for (j = 0; j < strlen(gramatica->estados[i]->follow); j++)
+    {
+      printf("%c", gramatica->estados[i]->follow[j]);
+
+      if (j != strlen(gramatica->estados[i]->follow) - 1) {
+        printf(", ");
+      }
+    }
+
+    printf("\n");
 	}
 
 	return;
